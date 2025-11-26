@@ -62,6 +62,7 @@ export const createUser = async (req, res, next) => {
       email,
       designation,
       role,
+      phone,
       asset_id,
       order_id,
       project_id,
@@ -97,6 +98,7 @@ export const createUser = async (req, res, next) => {
       email,
       designation,
       role,
+      phone,
       asset_id,
       order_id,
       project_id,
@@ -123,6 +125,7 @@ export const updateUser = async (req, res, next) => {
       email,
       designation,
       role,
+      phone,
       asset_id,
       order_id,
       project_id,
@@ -154,6 +157,7 @@ export const updateUser = async (req, res, next) => {
     if (email) userDoc.email = email;
     if (designation) userDoc.designation = designation;
     if (role) userDoc.role = role;
+    if (phone) userDoc.phone = phone;
 
     if (asset_id) userDoc.asset_id = asset_id;
     if (order_id) userDoc.order_id = order_id;

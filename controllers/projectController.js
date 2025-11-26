@@ -52,6 +52,30 @@ export const getProjectById = async (req, res, next) => {
   }
 };
 
+export const getProjectsByCustomerId = async (req, res, next) => {
+  try {
+    const { customerId } = req.params;
+
+    const projects = await Project.find({ customer_id: customerId })
+      .populate("customer_id")
+      .sort({ created_at: -1 });
+
+    if (!projects || projects.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No projects found for this customer",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      projects,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const createProject = async (req, res, next) => {
   try {
     const {
