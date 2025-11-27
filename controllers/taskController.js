@@ -59,6 +59,78 @@ export const getTaskById = async (req, res, next) => {
   }
 }
 
+// ✅ Get tasks by Order ID
+export const getTaskByOrderId = async (req, res, next) => {
+  try {
+    const { orderId } = req.params
+
+    const tasks = await Task.find({ order_id: orderId })
+      .populate("project_id")
+      .populate("asset_id")
+      .populate("customer_id")
+      .sort({ created_at: -1 })
+
+    if (!tasks || tasks.length === 0) {
+      return res.status(404).json({ message: "No tasks found for this order" })
+    }
+
+    res.status(200).json({
+      success: true,
+      tasks,
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+// ✅ Get tasks by Customer ID
+export const getTaskByCustomerId = async (req, res, next) => {
+  try {
+    const { customerId } = req.params
+
+    const tasks = await Task.find({ customer_id: customerId })
+      .populate("project_id")
+      .populate("asset_id")
+      .populate("order_id")
+      .sort({ created_at: -1 })
+
+    if (!tasks || tasks.length === 0) {
+      return res.status(404).json({ message: "No tasks found for this customer" })
+    }
+
+    res.status(200).json({
+      success: true,
+      tasks,
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+// ✅ Get tasks by Project ID
+export const getTaskByProjectId = async (req, res, next) => {
+  try {
+    const { projectId } = req.params
+
+    const tasks = await Task.find({ project_id: projectId })
+      .populate("asset_id")
+      .populate("order_id")
+      .populate("customer_id")
+      .sort({ created_at: -1 })
+
+    if (!tasks || tasks.length === 0) {
+      return res.status(404).json({ message: "No tasks found for this project" })
+    }
+
+    res.status(200).json({
+      success: true,
+      tasks,
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
 export const createTask = async (req, res, next) => {
   try {
     const {

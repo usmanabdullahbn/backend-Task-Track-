@@ -53,6 +53,50 @@ export const getOrderById = async (req, res, next) => {
   }
 }
 
+export const getOrderByProjectId = async (req, res, next) => {
+  try {
+    const { projectId } = req.params
+
+    const orders = await Order.find({ project_id: projectId })
+      .populate("project_id")
+      .populate("customer_id")
+      .sort({ created_at: -1 })
+
+    if (!orders || orders.length === 0) {
+      return res.status(404).json({ message: "No orders found for this project" })
+    }
+
+    res.status(200).json({
+      success: true,
+      orders,
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const getOrderByCustomerId = async (req, res, next) => {
+  try {
+    const { customerId } = req.params
+
+    const orders = await Order.find({ customer_id: customerId })
+      .populate("project_id")
+      .populate("customer_id")
+      .sort({ created_at: -1 })
+
+    if (!orders || orders.length === 0) {
+      return res.status(404).json({ message: "No orders found for this customer" })
+    }
+
+    res.status(200).json({
+      success: true,
+      orders,
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
 export const createOrder = async (req, res, next) => {
   try {
     const {
