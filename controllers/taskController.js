@@ -6,19 +6,18 @@ export const getTasks = async (req, res, next) => {
     const { page = 1, limit = 10, search, status, priority } = req.query
     const skip = (page - 1) * limit
 
-    const query = {}
+    let query = {}
+
     if (search) {
       query.title = { $regex: search, $options: "i" }
     }
+
     if (status) query.status = status
     if (priority) query.priority = priority
 
     const tasks = await Task.find(query)
-      .populate("project_id")
-      .populate("asset_id")
-      .populate("order_id")
       .skip(skip)
-      .limit(Number.parseInt(limit))
+      .limit(Number(limit))
       .sort({ created_at: -1 })
 
     const total = await Task.countDocuments(query)
@@ -27,7 +26,7 @@ export const getTasks = async (req, res, next) => {
       success: true,
       tasks,
       total,
-      page: Number.parseInt(page),
+      page: Number(page),
       pages: Math.ceil(total / limit),
     })
   } catch (error) {
@@ -38,16 +37,12 @@ export const getTasks = async (req, res, next) => {
 export const getTaskById = async (req, res, next) => {
   try {
     const task = await Task.findById(req.params.id)
-      .populate("project_id")
-      .populate("asset_id")
-      .populate("order_id")
-      .populate("customer_id")
 
     if (!task) {
       return res.status(404).json({ message: "Task not found" })
     }
 
-    const assignments = await TaskAssignment.find({ task_id: req.params.id }).populate("employee_id")
+    const assignments = await TaskAssignment.find({ task_id: req.params.id })
 
     res.status(200).json({
       success: true,
@@ -64,20 +59,13 @@ export const getTaskByOrderId = async (req, res, next) => {
   try {
     const { orderId } = req.params
 
-    const tasks = await Task.find({ order_id: orderId })
-      .populate("project_id")
-      .populate("asset_id")
-      .populate("customer_id")
-      .sort({ created_at: -1 })
+    const tasks = await Task.find({ "order.id": orderId }).sort({ created_at: -1 })
 
-    if (!tasks || tasks.length === 0) {
+    if (!tasks.length) {
       return res.status(404).json({ message: "No tasks found for this order" })
     }
 
-    res.status(200).json({
-      success: true,
-      tasks,
-    })
+    res.status(200).json({ success: true, tasks })
   } catch (error) {
     next(error)
   }
@@ -88,20 +76,13 @@ export const getTaskByCustomerId = async (req, res, next) => {
   try {
     const { customerId } = req.params
 
-    const tasks = await Task.find({ customer_id: customerId })
-      .populate("project_id")
-      .populate("asset_id")
-      .populate("order_id")
-      .sort({ created_at: -1 })
+    const tasks = await Task.find({ "customer.id": customerId }).sort({ created_at: -1 })
 
-    if (!tasks || tasks.length === 0) {
+    if (!tasks.length) {
       return res.status(404).json({ message: "No tasks found for this customer" })
     }
 
-    res.status(200).json({
-      success: true,
-      tasks,
-    })
+    res.status(200).json({ success: true, tasks })
   } catch (error) {
     next(error)
   }
@@ -112,20 +93,13 @@ export const getTaskByProjectId = async (req, res, next) => {
   try {
     const { projectId } = req.params
 
-    const tasks = await Task.find({ project_id: projectId })
-      .populate("asset_id")
-      .populate("order_id")
-      .populate("customer_id")
-      .sort({ created_at: -1 })
+    const tasks = await Task.find({ "project.id": projectId }).sort({ created_at: -1 })
 
-    if (!tasks || tasks.length === 0) {
+    if (!tasks.length) {
       return res.status(404).json({ message: "No tasks found for this project" })
     }
 
-    res.status(200).json({
-      success: true,
-      tasks,
-    })
+    res.status(200).json({ success: true, tasks })
   } catch (error) {
     next(error)
   }
@@ -134,10 +108,11 @@ export const getTaskByProjectId = async (req, res, next) => {
 export const createTask = async (req, res, next) => {
   try {
     const {
-      asset_id,
-      order_id,
-      project_id,
-      customer_id,
+      customer,
+      employee,
+      project,
+      asset,
+      order,
       title,
       description,
       plan_duration,
@@ -148,10 +123,11 @@ export const createTask = async (req, res, next) => {
     } = req.body
 
     const task = await Task.create({
-      asset_id,
-      order_id,
-      project_id,
-      customer_id,
+      customer,
+      employee,
+      project,
+      asset,
+      order,
       title,
       description,
       plan_duration,
@@ -173,11 +149,18 @@ export const createTask = async (req, res, next) => {
 
 export const updateTask = async (req, res, next) => {
   try {
+    const task = await Task.findById(req.params.id)
+
+    if (!task) {
+      return res.status(404).json({ message: "Task not found" })
+    }
+
     const {
-      asset_id,
-      order_id,
-      project_id,
-      customer_id,
+      customer,
+      employee,
+      project,
+      asset,
+      order,
       title,
       description,
       plan_duration,
@@ -191,16 +174,12 @@ export const updateTask = async (req, res, next) => {
       percentage_complete,
     } = req.body
 
-    const task = await Task.findById(req.params.id)
+    if (customer) task.customer = customer
+    if (employee) task.employee = employee
+    if (project) task.project = project
+    if (asset) task.asset = asset
+    if (order) task.order = order
 
-    if (!task) {
-      return res.status(404).json({ message: "Task not found" })
-    }
-
-    if (asset_id) task.asset_id = asset_id
-    if (order_id) task.order_id = order_id
-    if (project_id) task.project_id = project_id
-    if (customer_id) task.customer_id = customer_id
     if (title) task.title = title
     if (description) task.description = description
     if (plan_duration) task.plan_duration = plan_duration
@@ -211,15 +190,17 @@ export const updateTask = async (req, res, next) => {
     if (file_upload) task.file_upload = file_upload
     if (priority) task.priority = priority
     if (status) task.status = status
-    if (percentage_complete !== undefined) task.percentage_complete = percentage_complete
 
-    task.modified_at = new Date()
-    task.modified_user = req.body.userId
+    if (percentage_complete !== undefined)
+      task.percentage_complete = percentage_complete
 
     if (status === "Completed") {
       task.completed = true
       task.percentage_complete = 100
     }
+
+    task.modified_at = new Date()
+    task.modified_user = req.body.userId
 
     await task.save()
 

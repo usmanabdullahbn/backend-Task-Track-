@@ -2,22 +2,58 @@ import mongoose from "mongoose"
 import { TASK_STATUS, TASK_PRIORITY } from "../config/constants.js"
 
 const taskSchema = new mongoose.Schema({
-  asset_id: {
-    type: String,
-    required: [true, "Please provide a assert"],
+customer: {
+    id: {
+      type: String,
+      required: [true, "Please provide a customer Id"],
+    },
+    name: {
+      type: String,
+      required: [true, "Please provide a customer name"],
+    },
   },
-  order_id: {
-    type: String,
-    required: [true, "Please provide a order"],
+
+  employee: {
+    id: {
+      type: String,
+      required: [true, "Please provide a empoloyee Id"],
+    },
+    name: {
+      type: String,
+      required: [true, "Please provide a empoloyee name"],
+    },
   },
-  project_id: {
-    type: String,
-    required: [true, "Please provide a project"],
+  project: {
+    id: {
+      type: String,
+      required: [true, "Please provide a project Id"],
+    },
+    name: {
+      type: String,
+      required: [true, "Please provide a project name"],
+    },
   },
-  customer_id: {
-    type: String,
-    required: [true, "Please provide a customer"],
+  asset: {
+    id: {
+      type: String,
+      required: [true, "Please provide a asset Id"],
+    },
+    name: {
+      type: String,
+      required: [true, "Please provide a asset name"],
+    },
   },
+  order: {
+    id: {
+      type: String,
+      required: [true, "Please provide a order Id"],
+    },
+    name: {
+      type: String,
+      required: [true, "Please provide a order name"],
+    },
+  },
+  
   title: {
     type: String,
     required: [true, "Please provide a task title"],

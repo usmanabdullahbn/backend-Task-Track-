@@ -2,15 +2,39 @@ import mongoose from "mongoose";
 import { ORDER_STATUS } from "../config/constants.js";
 
 const orderSchema = new mongoose.Schema({
-  project_id: {
-    type: String,
 
-    required: [true, "Please provide a project"],
+    customer: {
+    id: {
+      type: String,
+      required: [true, "Please provide a customer Id"],
+    },
+    name: {
+      type: String,
+      required: [true, "Please provide a customer name"],
+    },
   },
-  customer_id: {
-    type: String,
-    required: [true, "Please provide a customer"],
+
+  employee: {
+    id: {
+      type: String,
+      required: [true, "Please provide a empoloyee Id"],
+    },
+    name: {
+      type: String,
+      required: [true, "Please provide a empoloyee name"],
+    },
   },
+  project: {
+    id: {
+      type: String,
+      required: [true, "Please provide a project Id"],
+    },
+    name: {
+      type: String,
+      required: [true, "Please provide a project name"],
+    },
+  },
+ 
   order_number: {
     type: String,
     required: [true, "Please provide an order number"],

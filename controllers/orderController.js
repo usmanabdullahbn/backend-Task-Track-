@@ -6,20 +6,22 @@ export const getOrders = async (req, res, next) => {
     const skip = (page - 1) * limit
 
     let query = {}
+
+    // Search order number or ERP
     if (search) {
-      query = {
-        $or: [{ order_number: { $regex: search, $options: "i" } }, { erp_number: { $regex: search, $options: "i" } }],
-      }
+      query.$or = [
+        { order_number: { $regex: search, $options: "i" } },
+        { erp_number: { $regex: search, $options: "i" } }
+      ]
     }
+
     if (status) {
       query.status = status
     }
 
     const orders = await Order.find(query)
-      .populate("project_id")
-      .populate("customer_id")
       .skip(skip)
-      .limit(Number.parseInt(limit))
+      .limit(Number(limit))
       .sort({ created_at: -1 })
 
     const total = await Order.countDocuments(query)
@@ -28,7 +30,7 @@ export const getOrders = async (req, res, next) => {
       success: true,
       orders,
       total,
-      page: Number.parseInt(page),
+      page: Number(page),
       pages: Math.ceil(total / limit),
     })
   } catch (error) {
@@ -38,7 +40,7 @@ export const getOrders = async (req, res, next) => {
 
 export const getOrderById = async (req, res, next) => {
   try {
-    const order = await Order.findById(req.params.id).populate("project_id").populate("customer_id")
+    const order = await Order.findById(req.params.id)
 
     if (!order) {
       return res.status(404).json({ message: "Order not found" })
@@ -57,12 +59,9 @@ export const getOrderByProjectId = async (req, res, next) => {
   try {
     const { projectId } = req.params
 
-    const orders = await Order.find({ project_id: projectId })
-      .populate("project_id")
-      .populate("customer_id")
-      .sort({ created_at: -1 })
+    const orders = await Order.find({ "project.id": projectId }).sort({ created_at: -1 })
 
-    if (!orders || orders.length === 0) {
+    if (!orders.length) {
       return res.status(404).json({ message: "No orders found for this project" })
     }
 
@@ -79,12 +78,9 @@ export const getOrderByCustomerId = async (req, res, next) => {
   try {
     const { customerId } = req.params
 
-    const orders = await Order.find({ customer_id: customerId })
-      .populate("project_id")
-      .populate("customer_id")
-      .sort({ created_at: -1 })
+    const orders = await Order.find({ "customer.id": customerId }).sort({ created_at: -1 })
 
-    if (!orders || orders.length === 0) {
+    if (!orders.length) {
       return res.status(404).json({ message: "No orders found for this customer" })
     }
 
@@ -100,8 +96,9 @@ export const getOrderByCustomerId = async (req, res, next) => {
 export const createOrder = async (req, res, next) => {
   try {
     const {
-      project_id,
-      customer_id,
+      customer,
+      employee,
+      project,
       order_number,
       erp_number,
       amount,
@@ -113,8 +110,9 @@ export const createOrder = async (req, res, next) => {
     } = req.body
 
     const order = await Order.create({
-      project_id,
-      customer_id,
+      customer,
+      employee,
+      project,
       order_number,
       erp_number,
       amount,
@@ -137,9 +135,16 @@ export const createOrder = async (req, res, next) => {
 
 export const updateOrder = async (req, res, next) => {
   try {
+    const order = await Order.findById(req.params.id)
+
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" })
+    }
+
     const {
-      project_id,
-      customer_id,
+      customer,
+      employee,
+      project,
       order_number,
       erp_number,
       amount,
@@ -151,14 +156,10 @@ export const updateOrder = async (req, res, next) => {
       notes,
     } = req.body
 
-    const order = await Order.findById(req.params.id)
+    if (customer) order.customer = customer
+    if (employee) order.employee = employee
+    if (project) order.project = project
 
-    if (!order) {
-      return res.status(404).json({ message: "Order not found" })
-    }
-
-    if (project_id) order.project_id = project_id
-    if (customer_id) order.customer_id = customer_id
     if (order_number) order.order_number = order_number
     if (erp_number) order.erp_number = erp_number
     if (amount) order.amount = amount

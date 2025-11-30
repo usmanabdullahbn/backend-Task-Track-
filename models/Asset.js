@@ -2,18 +2,56 @@ import mongoose from "mongoose"
 import { ASSET_STATUS } from "../config/constants.js"
 
 const assetSchema = new mongoose.Schema({
-  order_id: {
-    type: String,
-    required: [true, "Please provide a Order ID"],
-    
+customer: {
+    id: {
+      type: String,
+      required: [true, "Please provide a customer Id"],
+    },
+    name: {
+      type: String,
+      required: [true, "Please provide a customer name"],
+    },
   },
-  project_id: {
-    type: String,
-    required: [true, "Please provide a project ID"],
+
+  employee: {
+    id: {
+      type: String,
+      required: [true, "Please provide a empoloyee Id"],
+    },
+    name: {
+      type: String,
+      required: [true, "Please provide a empoloyee name"],
+    },
   },
-  customer_id: {
-    type: String,
-    required: [true, "Please provide a Customer ID"],
+  project: {
+    id: {
+      type: String,
+      required: [true, "Please provide a project Id"],
+    },
+    name: {
+      type: String,
+      required: [true, "Please provide a project name"],
+    },
+  },
+  task: {
+    id: {
+      type: String,
+      required: [true, "Please provide a task Id"],
+    },
+    name: {
+      type: String,
+      required: [true, "Please provide a task name"],
+    },
+  },
+  order: {
+    id: {
+      type: String,
+      required: [true, "Please provide a order Id"],
+    },
+    name: {
+      type: String,
+      required: [true, "Please provide a order name"],
+    },
   },
   title: {
     type: String,

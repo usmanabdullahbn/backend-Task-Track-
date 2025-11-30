@@ -1,22 +1,31 @@
 import Project from "../models/Project.js";
 
+// ============================
+// GET ALL PROJECTS
+// ============================
 export const getProjects = async (req, res, next) => {
   try {
-    const { page = 1, limit = 10, search, status } = req.query;
+    const { page = 1, limit = 10, search, status, employeeId } = req.query;
     const skip = (page - 1) * limit;
 
     const query = {};
+
     if (search) {
       query.title = { $regex: search, $options: "i" };
     }
+
     if (status) {
       query.status = status;
     }
 
+    // NEW: Filter by employee.id if provided
+    if (employeeId) {
+      query["employee.id"] = employeeId;
+    }
+
     const projects = await Project.find(query)
-      .populate("customer_id")
       .skip(skip)
-      .limit(Number.parseInt(limit))
+      .limit(Number(limit))
       .sort({ created_at: -1 });
 
     const total = await Project.countDocuments(query);
@@ -25,7 +34,7 @@ export const getProjects = async (req, res, next) => {
       success: true,
       projects,
       total,
-      page: Number.parseInt(page),
+      page: Number(page),
       pages: Math.ceil(total / limit),
     });
   } catch (error) {
@@ -33,11 +42,12 @@ export const getProjects = async (req, res, next) => {
   }
 };
 
+// ============================
+// GET PROJECT BY ID
+// ============================
 export const getProjectById = async (req, res, next) => {
   try {
-    const project = await Project.findById(req.params.id).populate(
-      "customer_id"
-    );
+    const project = await Project.findById(req.params.id);
 
     if (!project) {
       return res.status(404).json({ message: "Project not found" });
@@ -52,13 +62,16 @@ export const getProjectById = async (req, res, next) => {
   }
 };
 
+// ============================
+// GET PROJECTS BY CUSTOMER ID
+// ============================
 export const getProjectsByCustomerId = async (req, res, next) => {
   try {
     const { customerId } = req.params;
 
-    const projects = await Project.find({ customer_id: customerId })
-      .populate("customer_id")
-      .sort({ created_at: -1 });
+    const projects = await Project.find({ "customer.id": customerId }).sort({
+      created_at: -1,
+    });
 
     if (!projects || projects.length === 0) {
       return res.status(404).json({
@@ -76,10 +89,14 @@ export const getProjectsByCustomerId = async (req, res, next) => {
   }
 };
 
+// ============================
+// CREATE PROJECT
+// ============================
 export const createProject = async (req, res, next) => {
   try {
     const {
-      customer_id,
+      customer,   // { id, name }
+      employee,   // NEW → { id, name }
       title,
       map_location,
       contact_name,
@@ -95,7 +112,8 @@ export const createProject = async (req, res, next) => {
     } = req.body;
 
     const project = await Project.create({
-      customer_id,
+      customer,
+      employee,   // NEW FIELD
       title,
       map_location,
       contact_name,
@@ -120,10 +138,14 @@ export const createProject = async (req, res, next) => {
   }
 };
 
+// ============================
+// UPDATE PROJECT
+// ============================
 export const updateProject = async (req, res, next) => {
   try {
     const {
-      customer_id,
+      customer,   // contains id + name if changed
+      employee,   // NEW handling
       title,
       map_location,
       contact_name,
@@ -145,7 +167,8 @@ export const updateProject = async (req, res, next) => {
       return res.status(404).json({ message: "Project not found" });
     }
 
-    if (customer_id) project.customer_id = customer_id;
+    if (customer) project.customer = customer;
+    if (employee) project.employee = employee;  // NEW
     if (title) project.title = title;
     if (map_location) project.map_location = map_location;
     if (contact_name) project.contact_name = contact_name;
@@ -174,7 +197,9 @@ export const updateProject = async (req, res, next) => {
   }
 };
 
-
+// ============================
+// DELETE PROJECT
+// ============================
 export const deleteProject = async (req, res, next) => {
   try {
     await Project.findByIdAndDelete(req.params.id);

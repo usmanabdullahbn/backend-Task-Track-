@@ -1,11 +1,16 @@
 import Asset from "../models/Asset.js"
 
+// -----------------------------------------------------
+// GET ALL ASSETS
+// -----------------------------------------------------
 export const getAssets = async (req, res, next) => {
   try {
     const { page = 1, limit = 10, search, status, category } = req.query
     const skip = (page - 1) * limit
 
     let query = {}
+
+    // Search
     if (search) {
       query = {
         $or: [
@@ -15,14 +20,13 @@ export const getAssets = async (req, res, next) => {
         ],
       }
     }
+
     if (status) query.status = status
     if (category) query.category = category
 
     const assets = await Asset.find(query)
-      .populate("project_id")
-      .populate("customer_id")
       .skip(skip)
-      .limit(Number.parseInt(limit))
+      .limit(Number(limit))
       .sort({ created_at: -1 })
 
     const total = await Asset.countDocuments(query)
@@ -31,7 +35,7 @@ export const getAssets = async (req, res, next) => {
       success: true,
       assets,
       total,
-      page: Number.parseInt(page),
+      page: Number(page),
       pages: Math.ceil(total / limit),
     })
   } catch (error) {
@@ -39,12 +43,12 @@ export const getAssets = async (req, res, next) => {
   }
 }
 
+// -----------------------------------------------------
+// GET ASSET BY ID
+// -----------------------------------------------------
 export const getAssetById = async (req, res, next) => {
   try {
     const asset = await Asset.findById(req.params.id)
-      .populate("project_id")
-      .populate("customer_id")
-      .populate("order_id")
 
     if (!asset) {
       return res.status(404).json({ message: "Asset not found" })
@@ -59,12 +63,23 @@ export const getAssetById = async (req, res, next) => {
   }
 }
 
+// -----------------------------------------------------
+// CREATE ASSET
+// -----------------------------------------------------
 export const createAsset = async (req, res, next) => {
   try {
     const {
-      order_id,
-      project_id,
       customer_id,
+      customer_name,
+      employee_id,
+      employee_name,
+      project_id,
+      project_name,
+      task_id,
+      task_name,
+      order_id,
+      order_name,
+
       title,
       description,
       model,
@@ -77,9 +92,12 @@ export const createAsset = async (req, res, next) => {
     } = req.body
 
     const asset = await Asset.create({
-      order_id,
-      project_id,
-      customer_id,
+      customer: { id: customer_id, name: customer_name },
+      employee: { id: employee_id, name: employee_name },
+      project: { id: project_id, name: project_name },
+      task: { id: task_id, name: task_name },
+      order: { id: order_id, name: order_name },
+
       title,
       description,
       model,
@@ -89,6 +107,7 @@ export const createAsset = async (req, res, next) => {
       barcode,
       file_upload,
       location,
+
       created_user: req.body.userId,
     })
 
@@ -101,12 +120,23 @@ export const createAsset = async (req, res, next) => {
   }
 }
 
+// -----------------------------------------------------
+// UPDATE ASSET
+// -----------------------------------------------------
 export const updateAsset = async (req, res, next) => {
   try {
     const {
-      order_id,
-      project_id,
       customer_id,
+      customer_name,
+      employee_id,
+      employee_name,
+      project_id,
+      project_name,
+      task_id,
+      task_name,
+      order_id,
+      order_name,
+
       title,
       description,
       model,
@@ -120,14 +150,27 @@ export const updateAsset = async (req, res, next) => {
     } = req.body
 
     const asset = await Asset.findById(req.params.id)
-
     if (!asset) {
       return res.status(404).json({ message: "Asset not found" })
     }
 
-    if (order_id) asset.order_id = order_id
-    if (project_id) asset.project_id = project_id
-    if (customer_id) asset.customer_id = customer_id
+    // Update nested objects
+    if (customer_id || customer_name)
+      asset.customer = { id: customer_id, name: customer_name }
+
+    if (employee_id || employee_name)
+      asset.employee = { id: employee_id, name: employee_name }
+
+    if (project_id || project_name)
+      asset.project = { id: project_id, name: project_name }
+
+    if (task_id || task_name)
+      asset.task = { id: task_id, name: task_name }
+
+    if (order_id || order_name)
+      asset.order = { id: order_id, name: order_name }
+
+    // Update normal fields
     if (title) asset.title = title
     if (description) asset.description = description
     if (model) asset.model = model
@@ -153,6 +196,9 @@ export const updateAsset = async (req, res, next) => {
   }
 }
 
+// -----------------------------------------------------
+// DELETE ASSET
+// -----------------------------------------------------
 export const deleteAsset = async (req, res, next) => {
   try {
     await Asset.findByIdAndDelete(req.params.id)
@@ -166,6 +212,9 @@ export const deleteAsset = async (req, res, next) => {
   }
 }
 
+// -----------------------------------------------------
+// GET ASSET BY BARCODE
+// -----------------------------------------------------
 export const getAssetByBarcode = async (req, res, next) => {
   try {
     const asset = await Asset.findOne({ barcode: req.params.barcode })
