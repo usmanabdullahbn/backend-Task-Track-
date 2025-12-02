@@ -10,15 +10,13 @@ export const getAssets = async (req, res, next) => {
 
     let query = {}
 
-    // Search
+    // SEARCH
     if (search) {
-      query = {
-        $or: [
-          { title: { $regex: search, $options: "i" } },
-          { barcode: { $regex: search, $options: "i" } },
-          { serial_number: { $regex: search, $options: "i" } },
-        ],
-      }
+      query.$or = [
+        { title: { $regex: search, $options: "i" } },
+        { barcode: { $regex: search, $options: "i" } },
+        { serial_number: { $regex: search, $options: "i" } }
+      ]
     }
 
     if (status) query.status = status
@@ -54,10 +52,7 @@ export const getAssetById = async (req, res, next) => {
       return res.status(404).json({ message: "Asset not found" })
     }
 
-    res.status(200).json({
-      success: true,
-      asset,
-    })
+    res.status(200).json({ success: true, asset })
   } catch (error) {
     next(error)
   }
@@ -75,10 +70,8 @@ export const createAsset = async (req, res, next) => {
       employee_name,
       project_id,
       project_name,
-      task_id,
-      task_name,
       order_id,
-      order_name,
+      order_number,
 
       title,
       description,
@@ -95,8 +88,7 @@ export const createAsset = async (req, res, next) => {
       customer: { id: customer_id, name: customer_name },
       employee: { id: employee_id, name: employee_name },
       project: { id: project_id, name: project_name },
-      task: { id: task_id, name: task_name },
-      order: { id: order_id, name: order_name },
+      order: { id: order_id, order_number },
 
       title,
       description,
@@ -132,10 +124,8 @@ export const updateAsset = async (req, res, next) => {
       employee_name,
       project_id,
       project_name,
-      task_id,
-      task_name,
       order_id,
-      order_name,
+      order_number,
 
       title,
       description,
@@ -154,23 +144,20 @@ export const updateAsset = async (req, res, next) => {
       return res.status(404).json({ message: "Asset not found" })
     }
 
-    // Update nested objects
+    // update nested fields only when provided
     if (customer_id || customer_name)
-      asset.customer = { id: customer_id, name: customer_name }
+      asset.customer = { id: customer_id ?? asset.customer.id, name: customer_name ?? asset.customer.name }
 
     if (employee_id || employee_name)
-      asset.employee = { id: employee_id, name: employee_name }
+      asset.employee = { id: employee_id ?? asset.employee.id, name: employee_name ?? asset.employee.name }
 
     if (project_id || project_name)
-      asset.project = { id: project_id, name: project_name }
+      asset.project = { id: project_id ?? asset.project.id, name: project_name ?? asset.project.name }
 
-    if (task_id || task_name)
-      asset.task = { id: task_id, name: task_name }
+    if (order_id || order_number)
+      asset.order = { id: order_id ?? asset.order.id, order_number: order_number ?? asset.order.order_number }
 
-    if (order_id || order_name)
-      asset.order = { id: order_id, name: order_name }
-
-    // Update normal fields
+    // normal fields
     if (title) asset.title = title
     if (description) asset.description = description
     if (model) asset.model = model
@@ -202,11 +189,7 @@ export const updateAsset = async (req, res, next) => {
 export const deleteAsset = async (req, res, next) => {
   try {
     await Asset.findByIdAndDelete(req.params.id)
-
-    res.status(200).json({
-      success: true,
-      message: "Asset deleted successfully",
-    })
+    res.status(200).json({ success: true, message: "Asset deleted successfully" })
   } catch (error) {
     next(error)
   }
@@ -219,14 +202,9 @@ export const getAssetByBarcode = async (req, res, next) => {
   try {
     const asset = await Asset.findOne({ barcode: req.params.barcode })
 
-    if (!asset) {
-      return res.status(404).json({ message: "Asset not found" })
-    }
+    if (!asset) return res.status(404).json({ message: "Asset not found" })
 
-    res.status(200).json({
-      success: true,
-      asset,
-    })
+    res.status(200).json({ success: true, asset })
   } catch (error) {
     next(error)
   }

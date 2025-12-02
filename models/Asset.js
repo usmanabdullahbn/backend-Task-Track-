@@ -16,13 +16,14 @@ customer: {
   employee: {
     id: {
       type: String,
-      required: [true, "Please provide a empoloyee Id"],
+      // required: [true, "Please provide a empoloyee Id"],
     },
     name: {
       type: String,
-      required: [true, "Please provide a empoloyee name"],
+      // required: [true, "Please provide a empoloyee name"],
     },
   },
+
   project: {
     id: {
       type: String,
@@ -41,18 +42,18 @@ customer: {
     },
     order_number: {
       type: String,
-      required: [true, "Please provide a order name"],
+      required: [true, "Please provide a order number"],
     },
   },
 
   task: {
     id: {
       type: String,
-      required: [true, "Please provide a task Id"],
+      // required: [true, "Please provide a task Id"],
     },
     name: {
       type: String,
-      required: [true, "Please provide a task name"],
+      // required: [true, "Please provide a task name"],
     },
   },
  
@@ -75,6 +76,8 @@ customer: {
   barcode: {
     type: String,
     unique: true,
+    required: [true, "Please provide an barcode"],
+
     sparse: true,
   },
   file_upload: String,
