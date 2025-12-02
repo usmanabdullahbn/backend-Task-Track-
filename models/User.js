@@ -44,10 +44,7 @@ const userSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "Project",
   },
-  // task_id: {
-  //   type: mongoose.Schema.Types.ObjectId,
-  //   ref: "Task",
-  // },
+
   customer_id: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Customer",

@@ -48,12 +48,12 @@ customer: {
       type: String,
       required: [true, "Please provide a order Id"],
     },
-    name: {
+    order_number: {
       type: String,
       required: [true, "Please provide a order name"],
     },
   },
-  
+
   title: {
     type: String,
     required: [true, "Please provide a task title"],
