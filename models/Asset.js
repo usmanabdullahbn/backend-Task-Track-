@@ -33,6 +33,18 @@ customer: {
       required: [true, "Please provide a project name"],
     },
   },
+
+   order: {
+    id: {
+      type: String,
+      required: [true, "Please provide a order Id"],
+    },
+    order_number: {
+      type: String,
+      required: [true, "Please provide a order name"],
+    },
+  },
+
   task: {
     id: {
       type: String,
@@ -43,16 +55,7 @@ customer: {
       required: [true, "Please provide a task name"],
     },
   },
-  order: {
-    id: {
-      type: String,
-      required: [true, "Please provide a order Id"],
-    },
-    name: {
-      type: String,
-      required: [true, "Please provide a order name"],
-    },
-  },
+ 
   title: {
     type: String,
     required: [true, "Please provide an asset title"],
