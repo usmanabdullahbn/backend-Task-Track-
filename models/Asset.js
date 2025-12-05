@@ -35,27 +35,27 @@ customer: {
     },
   },
 
-   order: {
-    id: {
-      type: String,
-      required: [true, "Please provide a order Id"],
-    },
-    order_number: {
-      type: String,
-      required: [true, "Please provide a order number"],
-    },
-  },
+  //  order: {
+  //   id: {
+  //     type: String,
+  //     // required: [true, "Please provide a order Id"],
+  //   },
+  //   order_number: {
+  //     type: String,
+  //     // required: [true, "Please provide a order number"],
+  //   },
+  // },
 
-  task: {
-    id: {
-      type: String,
-      // required: [true, "Please provide a task Id"],
-    },
-    name: {
-      type: String,
-      // required: [true, "Please provide a task name"],
-    },
-  },
+  // task: {
+  //   id: {
+  //     type: String,
+  //     // required: [true, "Please provide a task Id"],
+  //   },
+  //   name: {
+  //     type: String,
+  //     // required: [true, "Please provide a task name"],
+  //   },
+  // },
  
   title: {
     type: String,
@@ -76,7 +76,7 @@ customer: {
   barcode: {
     type: String,
     unique: true,
-    required: [true, "Please provide an barcode"],
+    // required: [true, "Please provide an barcode"],
 
     sparse: true,
   },

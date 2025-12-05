@@ -58,6 +58,27 @@ export const getAssetById = async (req, res, next) => {
   }
 }
 
+export const getAssetByCustomerId = async (req, res, next) => {
+  try {
+    const { customerId } = req.params
+
+    // Ensure string comparison
+    const assets = await Asset.find({ "customer.id": String(customerId) }).sort({ created_at: -1 })
+
+    if (!assets.length) {
+      return res.status(404).json({ message: "No assets found for this customer" })
+    }
+
+    res.status(200).json({
+      success: true,
+      assets,
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+
 // -----------------------------------------------------
 // CREATE ASSET
 // -----------------------------------------------------

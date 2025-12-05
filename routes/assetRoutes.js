@@ -3,6 +3,7 @@ import {
   createAsset,
   deleteAsset,
   getAssetByBarcode,
+  getAssetByCustomerId,
   getAssetById,
   getAssets,
   updateAsset,
@@ -14,6 +15,7 @@ const router = express.Router()
 router.get("/", getAssets)
 router.get("/barcode/:barcode", getAssetByBarcode)
 router.get("/:id", getAssetById)
+router.get("/customer/:customerId", getAssetByCustomerId)
 router.post("/", createAsset)
 router.put("/:id", updateAsset)
 router.delete("/:id", deleteAsset)
