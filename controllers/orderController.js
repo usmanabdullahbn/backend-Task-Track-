@@ -93,13 +93,36 @@ export const getOrderByCustomerId = async (req, res, next) => {
   }
 }
 
+
+
+// =======================
+// Create Order Controller
+// =======================
 export const createOrder = async (req, res, next) => {
+
+  const generateOrderNumber = async () => {
+    const lastOrder = await Order.findOne().sort({ created_at: -1 });
+    console.log(lastOrder)
+
+    let nextNumber = 1;
+
+    if (lastOrder && lastOrder.order_number) {
+      const parts = lastOrder.order_number.split("-");
+      const numericPart = parseInt(parts[1]);
+
+      if (!isNaN(numericPart)) {
+        nextNumber = numericPart + 1;
+      }
+    }
+
+    return `ORD-${String(nextNumber).padStart(3, "0")}`;
+  };
+
   try {
     const {
       customer,
       employee,
       project,
-      order_number,
       erp_number,
       amount,
       order_date,
@@ -107,7 +130,9 @@ export const createOrder = async (req, res, next) => {
       file_upload,
       public_link,
       notes,
-    } = req.body
+    } = req.body;
+
+    const order_number = await generateOrderNumber();
 
     const order = await Order.create({
       customer,
@@ -122,16 +147,19 @@ export const createOrder = async (req, res, next) => {
       public_link,
       notes,
       created_user: req.body.userId,
-    })
+    });
 
     res.status(201).json({
       success: true,
       order,
-    })
+    });
+    
   } catch (error) {
-    next(error)
+    next(error);
   }
-}
+};
+
+
 
 export const updateOrder = async (req, res, next) => {
   try {
@@ -145,7 +173,7 @@ export const updateOrder = async (req, res, next) => {
       customer,
       employee,
       project,
-      order_number,
+      // order_number,
       erp_number,
       amount,
       order_date,
@@ -160,7 +188,7 @@ export const updateOrder = async (req, res, next) => {
     if (employee) order.employee = employee
     if (project) order.project = project
 
-    if (order_number) order.order_number = order_number
+    // if (order_number) order.order_number = order_number
     if (erp_number) order.erp_number = erp_number
     if (amount) order.amount = amount
     if (order_date) order.order_date = order_date

@@ -2,8 +2,7 @@ import mongoose from "mongoose";
 import { ORDER_STATUS } from "../config/constants.js";
 
 const orderSchema = new mongoose.Schema({
-
-    customer: {
+  customer: {
     id: {
       type: String,
       required: [true, "Please provide a customer Id"],
@@ -34,16 +33,14 @@ const orderSchema = new mongoose.Schema({
       required: [true, "Please provide a project name"],
     },
   },
- 
+
   order_number: {
     type: String,
     required: [true, "Please provide an order number"],
-    unique: true,
+    // unique: true,
   },
   erp_number: {
     type: String,
-    unique: true,
-    sparse: true,
   },
   amount: {
     type: mongoose.Schema.Types.Decimal128,

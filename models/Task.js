@@ -5,42 +5,42 @@ const taskSchema = new mongoose.Schema({
 customer: {
     id: {
       type: String,
-      required: [true, "Please provide a customer Id"],
+      // required: [true, "Please provide a customer Id"],
     },
     name: {
       type: String,
-      required: [true, "Please provide a customer name"],
+      // required: [true, "Please provide a customer name"],
     },
   },
 
   employee: {
     id: {
       type: String,
-      required: [true, "Please provide a empoloyee Id"],
+      // required: [true, "Please provide a empoloyee Id"],
     },
     name: {
       type: String,
-      required: [true, "Please provide a empoloyee name"],
+      // required: [true, "Please provide a empoloyee name"],
     },
   },
   project: {
     id: {
       type: String,
-      required: [true, "Please provide a project Id"],
+      // required: [true, "Please provide a project Id"],
     },
     name: {
       type: String,
-      required: [true, "Please provide a project name"],
+      // required: [true, "Please provide a project name"],
     },
   },
   asset: {
     id: {
       type: String,
-      required: [true, "Please provide a asset Id"],
+      // required: [true, "Please provide a asset Id"],
     },
     name: {
       type: String,
-      required: [true, "Please provide a asset name"],
+      // required: [true, "Please provide a asset name"],
     },
   },
   order: {
@@ -56,7 +56,7 @@ customer: {
 
   title: {
     type: String,
-    required: [true, "Please provide a task title"],
+    // required: [true, "Please provide a task title"],
   },
   description: String,
   plan_duration: Number,
