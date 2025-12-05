@@ -33,6 +33,11 @@ const orderSchema = new mongoose.Schema({
       required: [true, "Please provide a project name"],
     },
   },
+    title: {
+    type: String,
+    required: [true, "Please provide an title"],
+    // unique: true,
+  },
 
   order_number: {
     type: String,
