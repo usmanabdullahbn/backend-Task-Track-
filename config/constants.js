@@ -3,7 +3,7 @@ export const ROLES = ["admin", "manager", "supervisor", "worker"];
 export const PROJECT_STATUS = ["Active", "Completed", "On Hold", "Cancelled"];
 export const ORDER_STATUS = [
   "Pending",
-  "Confirmed", // In Process
+  "In Progcess", // In Progcess
   "Open",
   "Completed",
   "Cancelled",  
