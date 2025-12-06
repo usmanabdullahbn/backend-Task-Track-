@@ -13,7 +13,7 @@ const orderSchema = new mongoose.Schema({
     },
   },
 
-  employee: {
+  user: {
     id: {
       type: String,
       required: [true, "Please provide a empoloyee Id"],
@@ -23,6 +23,7 @@ const orderSchema = new mongoose.Schema({
       required: [true, "Please provide a empoloyee name"],
     },
   },
+  
   project: {
     id: {
       type: String,

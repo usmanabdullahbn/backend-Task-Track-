@@ -93,6 +93,25 @@ export const getOrderByCustomerId = async (req, res, next) => {
   }
 }
 
+export const getOrderByUserId = async (req, res, next) => {
+  try {
+    const { userId } = req.params
+
+    const orders = await Order.find({ "user.id": userId }).sort({ created_at: -1 })
+
+    if (!orders.length) {
+      return res.status(404).json({ message: "No orders found for this user" })
+    }
+
+    res.status(200).json({
+      success: true,
+      orders,
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
 
 
 // =======================
