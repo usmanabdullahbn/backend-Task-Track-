@@ -140,7 +140,7 @@ export const createOrder = async (req, res, next) => {
   try {
     const {
       customer,
-      employee,
+      user,
       project,
       erp_number,
       title,
@@ -156,7 +156,7 @@ export const createOrder = async (req, res, next) => {
 
     const order = await Order.create({
       customer,
-      employee,
+      user,
       project,
       title,
       order_number,
@@ -192,7 +192,7 @@ export const updateOrder = async (req, res, next) => {
 
     const {
       customer,
-      employee,
+      user,
       project,
       // order_number,
       title,
@@ -207,7 +207,7 @@ export const updateOrder = async (req, res, next) => {
     } = req.body
 
     if (customer) order.customer = customer
-    if (employee) order.employee = employee
+    if (user) order.user = user
     if (project) order.project = project
 
     if (title) order.title = title

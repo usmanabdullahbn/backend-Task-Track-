@@ -16,11 +16,11 @@ const orderSchema = new mongoose.Schema({
   user: {
     id: {
       type: String,
-      required: [true, "Please provide a empoloyee Id"],
+      required: [true, "Please provide a user Id"],
     },
     name: {
       type: String,
-      required: [true, "Please provide a empoloyee name"],
+      required: [true, "Please provide a user name"],
     },
   },
   
@@ -37,7 +37,6 @@ const orderSchema = new mongoose.Schema({
     title: {
     type: String,
     required: [true, "Please provide an title"],
-    // unique: true,
   },
 
   order_number: {
