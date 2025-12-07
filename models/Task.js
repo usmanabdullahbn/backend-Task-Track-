@@ -13,7 +13,7 @@ customer: {
     },
   },
 
-  employee: {
+  user: {
     id: {
       type: String,
       // required: [true, "Please provide a empoloyee Id"],
@@ -48,7 +48,7 @@ customer: {
       type: String,
       required: [true, "Please provide a order Id"],
     },
-    order_number: {
+    title: {
       type: String,
       required: [true, "Please provide a order name"],
     },
@@ -56,7 +56,7 @@ customer: {
 
   title: {
     type: String,
-    // required: [true, "Please provide a task title"],
+    required: [true, "Please provide a task title"],
   },
   description: String,
   plan_duration: Number,

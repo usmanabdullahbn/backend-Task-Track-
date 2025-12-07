@@ -109,7 +109,7 @@ export const createTask = async (req, res, next) => {
   try {
     const {
       customer,
-      employee,
+      user,
       project,
       asset,
       order,
@@ -124,7 +124,7 @@ export const createTask = async (req, res, next) => {
 
     const task = await Task.create({
       customer,
-      employee,
+      user,
       project,
       asset,
       order,
@@ -157,7 +157,7 @@ export const updateTask = async (req, res, next) => {
 
     const {
       customer,
-      employee,
+      user,
       project,
       asset,
       order,
@@ -175,7 +175,7 @@ export const updateTask = async (req, res, next) => {
     } = req.body
 
     if (customer) task.customer = customer
-    if (employee) task.employee = employee
+    if (user) task.user = user
     if (project) task.project = project
     if (asset) task.asset = asset
     if (order) task.order = order
