@@ -1,4 +1,4 @@
-export const ROLES = ["admin", "manager", "supervisor", "technician", "Employee"];
+export const ROLES = ["admin", "manager", "supervisor", "technician", "employee"];
 
 export const PROJECT_STATUS = ["Active", "Completed", "On Hold", "Cancelled"];
 export const ORDER_STATUS = [
