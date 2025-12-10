@@ -12,17 +12,6 @@ const orderSchema = new mongoose.Schema({
       required: [true, "Please provide a customer name"],
     },
   },
-
-  user: {
-    id: {
-      type: String,
-      required: [true, "Please provide a user Id"],
-    },
-    name: {
-      type: String,
-      required: [true, "Please provide a user name"],
-    },
-  },
   
   project: {
     id: {
