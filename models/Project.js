@@ -13,16 +13,16 @@ const projectSchema = new mongoose.Schema({
     },
   },
 
-  employee: {
-    id: {
-      type: String,
-      required: [true, "Please provide a empoloyee Id"],
-    },
-    name: {
-      type: String,
-      required: [true, "Please provide a empoloyee name"],
-    },
-  },
+  // employee: {
+  //   id: {
+  //     type: String,
+  //     required: [true, "Please provide a empoloyee Id"],
+  //   },
+  //   name: {
+  //     type: String,
+  //     required: [true, "Please provide a empoloyee name"],
+  //   },
+  // },
 
   title: {
     type: String,
