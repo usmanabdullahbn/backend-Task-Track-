@@ -68,17 +68,16 @@ customer: {
   serial_number: {
     type: String,
     // unique: true,
-    sparse: true,
+    // sparse: true,
   },
   category: {
     type: String,
   },
   barcode: {
     type: String,
-    unique: true,
+    // unique: true,
     // required: [true, "Please provide an barcode"],
-
-    sparse: true,
+    // sparse: true,
   },
   file_upload: String,
   status: {
