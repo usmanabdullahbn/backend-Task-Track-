@@ -67,7 +67,7 @@ customer: {
   manufacturer: String,
   serial_number: {
     type: String,
-    unique: true,
+    // unique: true,
     sparse: true,
   },
   category: {
