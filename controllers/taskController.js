@@ -88,6 +88,38 @@ export const getTaskByCustomerId = async (req, res, next) => {
   }
 }
 
+export const getTaskByUserId = async (req, res, next) => {
+  try {
+    const { userId } = req.params
+    const { page = 1, limit = 10, status, priority } = req.query
+
+    const skip = (page - 1) * limit
+
+    const query = { "user.id": userId }
+
+    if (status) query.status = status
+    if (priority) query.priority = priority
+
+    const tasks = await Task.find(query)
+      .skip(skip)
+      .limit(Number(limit))
+      .sort({ created_at: -1 })
+
+    const total = await Task.countDocuments(query)
+
+    res.status(200).json({
+      success: true,
+      tasks,
+      total,
+      page: Number(page),
+      pages: Math.ceil(total / limit),
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+
 // ✅ Get tasks by Project ID
 export const getTaskByProjectId = async (req, res, next) => {
   try {

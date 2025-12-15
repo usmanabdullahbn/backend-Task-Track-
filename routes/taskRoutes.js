@@ -7,6 +7,7 @@ import {
   getTaskById,
   getTaskByOrderId,
   getTaskByProjectId,
+  getTaskByUserId,
   getTasks,
   updateTask,
   updateTaskAssignment,
@@ -23,6 +24,7 @@ router.delete("/:id", deleteTask)
 router.post("/:id/assign", assignTask)
 router.get("/order/:orderId", getTaskByOrderId)
 router.get("/customer/:customerId", getTaskByCustomerId)
+router.get("/user/:userId", getTaskByUserId)
 router.get("/project/:projectId", getTaskByProjectId)
 router.put("/:id/assign/:assignmentId", updateTaskAssignment)
 
