@@ -23,8 +23,8 @@ export const getDashboardStats = async (req, res, next) => {
     const inProgressTasks = await Task.countDocuments({
       status: "In Progress",
     });
-    const TodoTasks = await Task.countDocuments({ status: "Todo" });
-    const OnHoldTasks = await Task.countDocuments({ status: "On Hold" });
+    const todoTasks = await Task.countDocuments({ status: "Todo" });
+    const onHoldTasks = await Task.countDocuments({ status: "On Hold" });
 
     const pendingOrders = await Order.countDocuments({ status: "Pending" });
     const completedOrders = await Order.countDocuments({ status: "Completed" });
@@ -50,8 +50,8 @@ export const getDashboardStats = async (req, res, next) => {
         completedOrders,
         inProgressOrders,
         cancelledOrders,
-        TodoTasks,
-        OnHoldTasks,
+        todoTasks,
+        onHoldTasks,
       },
     });
   } catch (error) {
