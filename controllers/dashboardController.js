@@ -21,6 +21,8 @@ export const getDashboardStats = async (req, res, next) => {
     const inProgressTasks = await Task.countDocuments({ status: "In Progress" })
     const pendingOrders = await Order.countDocuments({ status: "Pending" })
     const completedOrders = await Order.countDocuments({ status: "Completed" })
+    const inProgressOrders = await Order.countDocuments({ status: "In Progress" })
+    const cancelledOrders = await Order.countDocuments({ status: "Cancelled" })
 
     res.status(200).json({
       success: true,
@@ -37,6 +39,8 @@ export const getDashboardStats = async (req, res, next) => {
         inProgressTasks,
         pendingOrders,
         completedOrders,
+        inProgressOrders,
+        cancelledOrders,
       },
     })
   } catch (error) {
