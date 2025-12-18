@@ -7,7 +7,7 @@ import User from "../models/User.js";
 
 export const getDashboardStats = async (req, res, next) => {
   try {
-    const totalEmployees = await User.countDocuments();
+    const totalEmployees = await User.countDocuments({role: { $in: ["manager", "supervisor", "technician"] }});
     const totalCustomers = await Customer.countDocuments();
     const totalProjects = await Project.countDocuments();
     const totalOrders = await Order.countDocuments();
