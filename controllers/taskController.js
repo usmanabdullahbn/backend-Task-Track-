@@ -154,6 +154,35 @@ export const createTask = async (req, res, next) => {
       priority,
     } = req.body
 
+    // ⛔ Validate required time fields
+    if (!start_time || !end_time) {
+      return res.status(400).json({
+        success: false,
+        message: "Start time and end time are required",
+      })
+    }
+
+    // 🔍 CHECK IF USER IS OCCUPIED
+    const occupiedTask = await Task.findOne({
+      "user.id": user.id,
+      start_time: { $lt: new Date(end_time) },
+      end_time: { $gt: new Date(start_time) },
+    })
+
+    if (occupiedTask) {
+      return res.status(409).json({
+        success: false,
+        message: "User is already occupied during this time",
+        occupiedTask: {
+          id: occupiedTask._id,
+          title: occupiedTask.title,
+          start_time: occupiedTask.start_time,
+          end_time: occupiedTask.end_time,
+        },
+      })
+    }
+
+    // ✅ CREATE TASK
     const task = await Task.create({
       customer,
       user,
@@ -205,6 +234,35 @@ export const updateTask = async (req, res, next) => {
       status,
       percentage_complete,
     } = req.body
+
+    // Determine final user, start_time, end_time for occupation check
+    let user_id = user ? user.id : task.user.id
+    let final_start = start_time !== undefined ? start_time : task.start_time
+    let final_end = end_time !== undefined ? end_time : task.end_time
+
+    // Check if user is occupied only if user, start_time, or end_time is being updated
+    if (user || start_time !== undefined || end_time !== undefined) {
+      // 🔍 CHECK IF USER IS OCCUPIED
+      const occupiedTask = await Task.findOne({
+        "user.id": user_id,
+        start_time: { $lt: new Date(final_end) },
+        end_time: { $gt: new Date(final_start) },
+        _id: { $ne: req.params.id }
+      })
+
+      if (occupiedTask) {
+        return res.status(409).json({
+          success: false,
+          message: "User is already occupied during this time",
+          occupiedTask: {
+            id: occupiedTask._id,
+            title: occupiedTask.title,
+            start_time: occupiedTask.start_time,
+            end_time: occupiedTask.end_time,
+          },
+        })
+      }
+    }
 
     if (customer) task.customer = customer
     if (user) task.user = user
