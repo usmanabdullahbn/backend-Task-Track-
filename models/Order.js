@@ -27,6 +27,16 @@ const orderSchema = new mongoose.Schema({
     type: String,
     required: [true, "Please provide an title"],
   },
+    employee: {
+    id: {
+      type: String,
+      required: [true, "Please provide a empoloyee Id"],
+    },
+    name: {
+      type: String,
+      required: [true, "Please provide a empoloyee name"],
+    },
+  },
 
   order_number: {
     type: String,
