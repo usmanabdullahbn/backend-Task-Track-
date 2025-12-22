@@ -15,11 +15,11 @@ customer: {
     employee: {
     id: {
       type: String,
-      required: [true, "Please provide a empoloyee Id"],
+      // required: [true, "Please provide a empoloyee Id"],
     },
     name: {
       type: String,
-      required: [true, "Please provide a empoloyee name"],
+      // required: [true, "Please provide a empoloyee name"],
     },
   },
 
