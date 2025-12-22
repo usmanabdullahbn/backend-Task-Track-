@@ -140,6 +140,7 @@ export const createOrder = async (req, res, next) => {
   try {
     const {
       customer,
+      employee,
       user,
       project,
       erp_number,
@@ -156,6 +157,7 @@ export const createOrder = async (req, res, next) => {
 
     const order = await Order.create({
       customer,
+      employee,
       user,
       project,
       title,
@@ -194,6 +196,7 @@ export const updateOrder = async (req, res, next) => {
       customer,
       user,
       project,
+      employee,
       // order_number,
       title,
       erp_number,
@@ -209,6 +212,7 @@ export const updateOrder = async (req, res, next) => {
     if (customer) order.customer = customer
     if (user) order.user = user
     if (project) order.project = project
+    if (employee) order.employee = employee
 
     if (title) order.title = title
     // if (order_number) order.order_number = order_number
