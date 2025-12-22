@@ -5,7 +5,18 @@ const userSchema = new mongoose.Schema({
   name: {
     type: String,
     required: [true, "Please provide a User name"],
+  },
 
+  // when a user is a employee of a customer
+  customer: {
+    id: {
+      type: String,
+      // required: [true, "Please provide a customer Id"],
+    },
+    name: {
+      type: String,
+      // required: [true, "Please provide a customer name"],
+    },
   },
 
   email: {

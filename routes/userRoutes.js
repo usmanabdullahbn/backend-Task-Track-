@@ -6,7 +6,8 @@ import {
   getUserById,
   updateUser,
   changeUserPassword,
-  deleteUser
+  deleteUser,
+  getUsersByCustomerId
 } from "../controllers/userController.js";
 
 
@@ -19,6 +20,7 @@ router.get("/", getUsers);
 router.post("/create", createUser);
 router.post("/login", loginUser);
 router.get("/:id", getUserById);
+router.get("/customer/:customerId", getUsersByCustomerId);
 router.put("/:id", updateUser);
 router.put("/:id/change-password", changeUserPassword);
 router.delete("/:id", deleteUser);

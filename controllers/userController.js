@@ -55,6 +55,30 @@ export const getUserById = async (req, res, next) => {
   }
 };
 
+export const getUsersByCustomerId = async (req, res, next) => {
+  try {
+    const { customerId } = req.params;
+
+    const users = await User.find({ "customer.id": customerId }).sort({
+      created_at: -1,
+    });
+
+    if (!users || users.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No users found for this customer",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      users,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 export const createUser = async (req, res, next) => {
   try {
     const {
@@ -67,6 +91,7 @@ export const createUser = async (req, res, next) => {
       order_id,
       project_id,
       customer_id,
+      customer,
     } = req.body;
 
     // 1️⃣ Check if email already exists
@@ -98,6 +123,7 @@ export const createUser = async (req, res, next) => {
       email,
       designation,
       role,
+      customer,
       phone,
       asset_id,
       order_id,
