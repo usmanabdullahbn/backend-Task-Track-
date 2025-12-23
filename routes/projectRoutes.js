@@ -5,6 +5,7 @@ import {
   getProjectById,
   getProjects,
   getProjectsByCustomerId,
+  getProjectsByEmployeeCustomerId,
   updateProject
 } from "../controllers/projectController.js";
 
@@ -16,6 +17,7 @@ router.get("/:id", getProjectById);
 router.put("/:id", updateProject);
 router.delete("/:id", deleteProject);
 router.get("/customer/:customerId", getProjectsByCustomerId);
+router.get("/employee/:employeeId", getProjectsByEmployeeCustomerId);
 
 
 

@@ -63,7 +63,51 @@ export const getAssetByCustomerId = async (req, res, next) => {
     const { customerId } = req.params
 
     // Ensure string comparison
-    const assets = await Asset.find({ "employee.id": String(customerId) }).sort({ created_at: -1 })
+    const assets = await Asset.find({ "customer.id": String(customerId) }).sort({ created_at: -1 })
+
+    if (!assets.length) {
+      return res.status(404).json({ message: "No assets found for this customer" })
+    }
+
+    res.status(200).json({
+      success: true,
+      assets,
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const getAssetsByEmployeeCustomerId = async (req, res, next) => {
+  try {
+    const { employeeId } = req.params
+
+    const assets = await Asset.find({ "employee.id": employeeId }).sort({
+      created_at: -1,
+    })
+
+    if (!assets || assets.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No assets found for this employee",
+      })
+    }
+
+    res.status(200).json({
+      success: true,
+      assets,
+    })
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const getAssetByEmployeeCustomerId = async (req, res, next) => {
+  try {
+    const { employeeId } = req.params
+
+    // Ensure string comparison
+    const assets = await Asset.find({ "employee.id": String(employeeId) }).sort({ created_at: -1 })
 
     if (!assets.length) {
       return res.status(404).json({ message: "No assets found for this customer" })

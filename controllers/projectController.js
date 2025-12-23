@@ -69,7 +69,7 @@ export const getProjectsByCustomerId = async (req, res, next) => {
   try {
     const { customerId } = req.params;
 
-    const projects = await Project.find({ "employee.id": customerId }).sort({
+    const projects = await Project.find({ "customer.id": customerId }).sort({
       created_at: -1,
     });
 
@@ -89,14 +89,38 @@ export const getProjectsByCustomerId = async (req, res, next) => {
   }
 };
 
+export const getProjectsByEmployeeCustomerId = async (req, res, next) => {
+  try {
+    const { employeeId } = req.params;
+
+    const projects = await Project.find({ "employee.id": employeeId }).sort({
+      created_at: -1,
+    });
+
+    if (!projects || projects.length === 0) {
+      return res.status(404).json({
+        success: false,
+        message: "No projects found for this employee",
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      projects,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // ============================
 // CREATE PROJECT
 // ============================
 export const createProject = async (req, res, next) => {
   try {
     const {
-      customer,   // { id, name }
-      employee,   // NEW → { id, name }
+      customer, // { id, name }
+      employee, // NEW → { id, name }
       title,
       map_location,
       contact_name,
@@ -113,7 +137,7 @@ export const createProject = async (req, res, next) => {
 
     const project = await Project.create({
       customer,
-      employee,   // NEW FIELD
+      employee, // NEW FIELD
       title,
       map_location,
       contact_name,
@@ -144,8 +168,8 @@ export const createProject = async (req, res, next) => {
 export const updateProject = async (req, res, next) => {
   try {
     const {
-      customer,   // contains id + name if changed
-      employee,   // NEW handling
+      customer, // contains id + name if changed
+      employee, // NEW handling
       title,
       map_location,
       contact_name,
@@ -168,7 +192,7 @@ export const updateProject = async (req, res, next) => {
     }
 
     if (customer) project.customer = customer;
-    if (employee) project.employee = employee;  // NEW
+    if (employee) project.employee = employee; // NEW
     if (title) project.title = title;
     if (map_location) project.map_location = map_location;
     if (contact_name) project.contact_name = contact_name;
