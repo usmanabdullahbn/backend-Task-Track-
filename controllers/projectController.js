@@ -69,7 +69,7 @@ export const getProjectsByCustomerId = async (req, res, next) => {
   try {
     const { customerId } = req.params;
 
-    const projects = await Project.find({ "customer.id": customerId }).sort({
+    const projects = await Project.find({ "employee.id": customerId }).sort({
       created_at: -1,
     });
 

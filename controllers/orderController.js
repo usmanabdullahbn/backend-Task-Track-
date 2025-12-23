@@ -78,7 +78,7 @@ export const getOrderByCustomerId = async (req, res, next) => {
   try {
     const { customerId } = req.params
 
-    const orders = await Order.find({ "customer.id": customerId }).sort({ created_at: -1 })
+    const orders = await Order.find({ "employee.id": customerId }).sort({ created_at: -1 })
 
     if (!orders.length) {
       return res.status(404).json({ message: "No orders found for this customer" })
