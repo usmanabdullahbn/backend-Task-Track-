@@ -12,14 +12,15 @@ import {
   updateTask,
   updateTaskAssignment,
 } from "../controllers/taskController.js"
+import { uploadMultiple } from "../config/multer.js"
 
 const router = express.Router()
 
 
 router.get("/", getTasks)
 router.get("/:id", getTaskById)
-router.post("/", createTask)
-router.put("/:id", updateTask)
+router.post("/", uploadMultiple, createTask)
+router.put("/:id", uploadMultiple, updateTask)
 router.delete("/:id", deleteTask)
 router.post("/:id/assign", assignTask)
 router.get("/order/:orderId", getTaskByOrderId)

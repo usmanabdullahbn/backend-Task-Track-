@@ -74,7 +74,14 @@ customer: {
   end_time: Date,
   actual_start_time: Date,
   actual_end_time: Date,
-  file_upload: String,
+  file_upload: [{
+    filename: String,
+    originalname: String,
+    mimetype: String,
+    size: Number,
+    path: String,
+    url: String
+  }],
   priority: {
     type: String,
     enum: TASK_PRIORITY,

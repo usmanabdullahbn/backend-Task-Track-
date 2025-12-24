@@ -79,7 +79,14 @@ customer: {
     // required: [true, "Please provide an barcode"],
     // sparse: true,
   },
-  file_upload: String,
+  file_upload: [{
+    filename: String,
+    originalname: String,
+    mimetype: String,
+    size: Number,
+    path: String,
+    url: String
+  }],
   status: {
     type: String,
     enum: ASSET_STATUS,

@@ -28,6 +28,9 @@ app.use(express.urlencoded({ limit: "50mb", extended: true }));
 // CORS
 app.use(cors());
 
+// Serve static files from uploads directory
+app.use('/uploads', express.static('uploads'));
+
 // API Routes
 
 app.use("/api/users", userRoutes);

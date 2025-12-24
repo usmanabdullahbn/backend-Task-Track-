@@ -145,9 +145,29 @@ export const createAsset = async (req, res, next) => {
       serial_number,
       category,
       barcode,
-      file_upload,
       location,
     } = req.body
+
+    // Handle multiple file uploads
+    let fileUploads = []
+    if (req.files) {
+      // Handle different possible field names
+      const allFiles = []
+      if (req.files.files) allFiles.push(...req.files.files)
+      if (req.files.file_upload) allFiles.push(...req.files.file_upload)
+      if (req.files['files[]']) allFiles.push(...req.files['files[]'])
+
+      if (allFiles.length > 0) {
+        fileUploads = allFiles.map(file => ({
+          filename: file.filename,
+          originalname: file.originalname,
+          mimetype: file.mimetype,
+          size: file.size,
+          path: file.path,
+          url: `/uploads/${file.filename}` // URL path for accessing the file
+        }))
+      }
+    }
 
     const asset = await Asset.create({
       customer: { id: customer_id, name: customer_name },
@@ -162,7 +182,7 @@ export const createAsset = async (req, res, next) => {
       serial_number,
       category,
       barcode,
-      file_upload,
+      file_upload: fileUploads, // Store array of file objects
       location,
 
       created_user: req.body.userId,
@@ -222,6 +242,28 @@ export const updateAsset = async (req, res, next) => {
     if (order_id || order_number)
       asset.order = { id: order_id ?? asset.order.id, order_number: order_number ?? asset.order.order_number }
 
+    // Handle multiple file uploads - append to existing files if any
+    if (req.files) {
+      const allFiles = []
+      if (req.files.files) allFiles.push(...req.files.files)
+      if (req.files.file_upload) allFiles.push(...req.files.file_upload)
+      if (req.files['files[]']) allFiles.push(...req.files['files[]'])
+
+      if (allFiles.length > 0) {
+        const newFileUploads = allFiles.map(file => ({
+          filename: file.filename,
+          originalname: file.originalname,
+          mimetype: file.mimetype,
+          size: file.size,
+          path: file.path,
+          url: `/uploads/${file.filename}`
+        }))
+
+        // Merge with existing files or create new array
+        asset.file_upload = asset.file_upload ? [...asset.file_upload, ...newFileUploads] : newFileUploads
+      }
+    }
+
     // normal fields
     if (title) asset.title = title
     if (description) asset.description = description
@@ -230,7 +272,6 @@ export const updateAsset = async (req, res, next) => {
     if (serial_number) asset.serial_number = serial_number
     if (category) asset.category = category
     if (barcode) asset.barcode = barcode
-    if (file_upload) asset.file_upload = file_upload
     if (status) asset.status = status
     if (location) asset.location = location
 

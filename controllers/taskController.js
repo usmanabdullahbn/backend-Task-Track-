@@ -150,9 +150,29 @@ export const createTask = async (req, res, next) => {
       plan_duration,
       start_time,
       end_time,
-      file_upload,
       priority,
     } = req.body
+
+    // Handle multiple file uploads
+    let fileUploads = []
+    if (req.files) {
+      // Handle different possible field names
+      const allFiles = []
+      if (req.files.files) allFiles.push(...req.files.files)
+      if (req.files.file_upload) allFiles.push(...req.files.file_upload)
+      if (req.files['files[]']) allFiles.push(...req.files['files[]'])
+
+      if (allFiles.length > 0) {
+        fileUploads = allFiles.map(file => ({
+          filename: file.filename,
+          originalname: file.originalname,
+          mimetype: file.mimetype,
+          size: file.size,
+          path: file.path,
+          url: `/uploads/${file.filename}` // URL path for accessing the file
+        }))
+      }
+    }
 
     // ⛔ Validate required time fields
     if (!start_time || !end_time) {
@@ -194,7 +214,7 @@ export const createTask = async (req, res, next) => {
       plan_duration,
       start_time,
       end_time,
-      file_upload,
+      file_upload: fileUploads, // Store array of file objects
       priority,
       created_user: req.body.userId,
     })
@@ -277,7 +297,29 @@ export const updateTask = async (req, res, next) => {
     if (end_time) task.end_time = end_time
     if (actual_start_time) task.actual_start_time = actual_start_time
     if (actual_end_time) task.actual_end_time = actual_end_time
-    if (file_upload) task.file_upload = file_upload
+
+    // Handle multiple file uploads - append to existing files if any
+    if (req.files) {
+      const allFiles = []
+      if (req.files.files) allFiles.push(...req.files.files)
+      if (req.files.file_upload) allFiles.push(...req.files.file_upload)
+      if (req.files['files[]']) allFiles.push(...req.files['files[]'])
+
+      if (allFiles.length > 0) {
+        const newFileUploads = allFiles.map(file => ({
+          filename: file.filename,
+          originalname: file.originalname,
+          mimetype: file.mimetype,
+          size: file.size,
+          path: file.path,
+          url: `/uploads/${file.filename}`
+        }))
+
+        // Merge with existing files or create new array
+        task.file_upload = task.file_upload ? [...task.file_upload, ...newFileUploads] : newFileUploads
+      }
+    }
+
     if (priority) task.priority = priority
     if (status) task.status = status
 
