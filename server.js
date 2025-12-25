@@ -2,6 +2,7 @@ import cors from "cors";
 import dotenv from "dotenv";
 import express from "express";
 import morgan from "morgan";
+import path from "path";
 
 import connectDB from "./config/database.js";
 import errorHandler from "./middleware/errorHandler.js";
@@ -28,8 +29,8 @@ app.use(express.urlencoded({ limit: "50mb", extended: true }));
 // CORS
 app.use(cors());
 
-// Serve static files from uploads directory
-app.use('/uploads', express.static('uploads'));
+// Serve uploaded files statically
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')));
 
 // API Routes
 
