@@ -185,8 +185,16 @@ export const createTask = async (req, res, next) => {
     // 🔍 CHECK IF USER IS OCCUPIED
     const occupiedTask = await Task.findOne({
       "user.id": user.id,
-      start_time: { $lt: new Date(end_time) },
-      end_time: { $gt: new Date(start_time) },
+      $expr: {
+        $and: [
+          { $lt: ["$start_time", new Date(end_time)] },
+          { $gt: ["$end_time", new Date(start_time)] },
+          { $eq: [
+            { $dateToString: { format: "%Y-%m-%d", date: "$start_time" } },
+            { $dateToString: { format: "%Y-%m-%d", date: new Date(start_time) } }
+          ] }
+        ]
+      }
     })
 
     if (occupiedTask) {
@@ -265,8 +273,16 @@ export const updateTask = async (req, res, next) => {
       // 🔍 CHECK IF USER IS OCCUPIED
       const occupiedTask = await Task.findOne({
         "user.id": user_id,
-        start_time: { $lt: new Date(final_end) },
-        end_time: { $gt: new Date(final_start) },
+        $expr: {
+          $and: [
+            { $lt: ["$start_time", new Date(final_end)] },
+            { $gt: ["$end_time", new Date(final_start)] },
+            { $eq: [
+              { $dateToString: { format: "%Y-%m-%d", date: "$start_time" } },
+              { $dateToString: { format: "%Y-%m-%d", date: new Date(final_start) } }
+            ] }
+          ]
+        },
         _id: { $ne: req.params.id }
       })
 
