@@ -178,10 +178,30 @@ export const createOrder = async (req, res, next) => {
       amount,
       order_date,
       delivery_date,
-      file_upload,
       public_link,
       notes,
     } = req.body;
+
+    // Handle multiple file uploads
+    let fileUploads = []
+    if (req.files) {
+      // Handle different possible field names
+      const allFiles = []
+      if (req.files.files) allFiles.push(...req.files.files)
+      if (req.files.file_upload) allFiles.push(...req.files.file_upload)
+      if (req.files['files[]']) allFiles.push(...req.files['files[]'])
+
+      if (allFiles.length > 0) {
+        fileUploads = allFiles.map(file => ({
+          filename: file.filename,
+          originalname: file.originalname,
+          mimetype: file.mimetype,
+          size: file.size,
+          path: file.path,
+          url: `/uploads/${file.filename}` // URL path for accessing the file
+        }))
+      }
+    }
 
     const order_number = await generateOrderNumber();
 
@@ -196,7 +216,7 @@ export const createOrder = async (req, res, next) => {
       amount,
       order_date,
       delivery_date,
-      file_upload,
+      file_upload: fileUploads, // Store array of file objects
       public_link,
       notes,
       created_user: req.body.userId,
@@ -230,7 +250,6 @@ export const updateOrder = async (req, res, next) => {
       amount,
       order_date,
       delivery_date,
-      file_upload,
       public_link,
       status,
       notes,
@@ -247,7 +266,29 @@ export const updateOrder = async (req, res, next) => {
     if (amount) order.amount = amount;
     if (order_date) order.order_date = order_date;
     if (delivery_date) order.delivery_date = delivery_date;
-    if (file_upload) order.file_upload = file_upload;
+
+    // Handle multiple file uploads - append to existing files if any
+    if (req.files) {
+      const allFiles = []
+      if (req.files.files) allFiles.push(...req.files.files)
+      if (req.files.file_upload) allFiles.push(...req.files.file_upload)
+      if (req.files['files[]']) allFiles.push(...req.files['files[]'])
+
+      if (allFiles.length > 0) {
+        const newFileUploads = allFiles.map(file => ({
+          filename: file.filename,
+          originalname: file.originalname,
+          mimetype: file.mimetype,
+          size: file.size,
+          path: file.path,
+          url: `/uploads/${file.filename}`
+        }))
+
+        // Merge with existing files or create new array
+        order.file_upload = order.file_upload ? [...order.file_upload, ...newFileUploads] : newFileUploads
+      }
+    }
+
     if (public_link) order.public_link = public_link;
     if (status) order.status = status;
     if (notes) order.notes = notes;

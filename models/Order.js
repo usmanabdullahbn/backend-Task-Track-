@@ -55,7 +55,14 @@ const orderSchema = new mongoose.Schema({
     default: Date.now,
   },
   delivery_date: Date,
-  file_upload: String,
+  file_upload: [{
+    filename: String,
+    originalname: String,
+    mimetype: String,
+    size: Number,
+    path: String,
+    url: String
+  }],
   public_link: String,
   status: {
     type: String,
