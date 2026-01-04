@@ -36,7 +36,8 @@ const fileFilter = (req, file, cb) => {
     'application/vnd.ms-excel',
     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
     'text/plain',
-    'text/csv'
+    'text/csv',
+    'application/json'
   ];
 
   if (allowedTypes.includes(file.mimetype)) {
