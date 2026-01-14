@@ -62,6 +62,11 @@ customer: {
       type: String,
       required: [true, "Please provide a order name"],
     },
+     order_number: {
+    type: String,
+    // required: [true, "Please provide an order number"],
+    // unique: true,
+  },
   },
 
   title: {
