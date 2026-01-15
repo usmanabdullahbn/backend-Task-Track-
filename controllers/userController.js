@@ -3,8 +3,7 @@ import User from "../models/User.js";
 export const getUsers = async (req, res, next) => {
   // I WANT PASS ALSO IN THE RESPONSE
   try {
-    const { page = 1, limit = 10, search } = req.query;
-    const skip = (page - 1) * limit;
+    const { search } = req.query;
 
     let query = {};
 
@@ -20,8 +19,6 @@ export const getUsers = async (req, res, next) => {
     }
 
     const Users = await User.find(query)
-      .skip(skip)
-      .limit(Number.parseInt(limit))
       .sort({ created_at: -1 });
 
     const total = await User.countDocuments(query);
@@ -30,8 +27,6 @@ export const getUsers = async (req, res, next) => {
       success: true,
       Users,
       total,
-      page: Number(page),
-      pages: Math.ceil(total / limit),
     });
   } catch (error) {
     next(error);
