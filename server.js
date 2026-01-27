@@ -13,6 +13,7 @@ import orderRoutes from "./routes/orderRoutes.js";
 import projectRoutes from "./routes/projectRoutes.js";
 import taskRoutes from "./routes/taskRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
+import employeeTimelineRoutes from "./routes/employeeTimelineRoutes.js";
 
 dotenv.config();
 connectDB();
@@ -41,6 +42,7 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/assets", assetRoutes);
 app.use("/api/tasks", taskRoutes);
 app.use("/api/dashboard", dashboardRoutes);
+app.use("/api/employee", employeeTimelineRoutes);
 
 // Health check
 app.get("/api/health", (req, res) => {
