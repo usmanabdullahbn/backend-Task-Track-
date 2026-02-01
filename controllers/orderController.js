@@ -2,9 +2,7 @@ import Order from "../models/Order.js";
 
 export const getOrders = async (req, res, next) => {
   try {
-    const { page = 1, limit = 10, search, status } = req.query;
-    const skip = (page - 1) * limit;
-
+    const { page, limit, search, status } = req.query;
     let query = {};
 
     // Search order number or ERP
@@ -19,20 +17,33 @@ export const getOrders = async (req, res, next) => {
       query.status = status;
     }
 
-    const orders = await Order.find(query)
-      .skip(skip)
-      .limit(Number(limit))
-      .sort({ created_at: -1 });
+    let ordersQuery = Order.find(query).sort({ created_at: -1 });
+
+    // Apply pagination only if limit is provided
+    if (limit) {
+      const pageNum = page ? Number(page) : 1;
+      const limitNum = Number(limit);
+      const skip = (pageNum - 1) * limitNum;
+      ordersQuery = ordersQuery.skip(skip).limit(limitNum);
+    }
+
+    const orders = await ordersQuery;
 
     const total = await Order.countDocuments(query);
 
-    res.status(200).json({
+    const response = {
       success: true,
       orders,
       total,
-      page: Number(page),
-      pages: Math.ceil(total / limit),
-    });
+    };
+
+    // Include pagination info only if limit was provided
+    if (limit) {
+      response.page = Number(page) || 1;
+      response.pages = Math.ceil(total / Number(limit));
+    }
+
+    res.status(200).json(response);
   } catch (error) {
     next(error);
   }
