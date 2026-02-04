@@ -28,6 +28,8 @@ export const saveEmployeeTimeline = async (req, res) => {
               lat: task.lat,
               lng: task.lng,
               title: task.title,
+              start_time: task.start_time || null,
+              end_time: task.end_time ?? null,
             },
           },
         },
@@ -50,6 +52,8 @@ export const saveEmployeeTimeline = async (req, res) => {
             lat: task.lat,
             lng: task.lng,
             title: task.title,
+            start_time: task.start_time || null,
+            end_time: task.end_time ?? null,
           },
         ],
       });
@@ -149,6 +153,55 @@ export const getTimelineByEmployeeIdAndDate = async (req, res) => {
 
     res.json({
       message: "Timeline retrieved successfully",
+      timeline,
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Update task with end_time
+export const updateTaskEndTime = async (req, res) => {
+  try {
+    const { employeeId, date, taskTitle, end_time } = req.body;
+
+    // Validate required fields (end_time may be null)
+    if (!employeeId || !date || !taskTitle) {
+      return res.status(400).json({
+        message: "Missing required fields: employeeId, date, taskTitle",
+      });
+    }
+
+    // Find timeline and update the specific task's end_time
+    const timeline = await EmployeeTimeline.findOne({
+      employeeId,
+      date,
+    });
+
+    if (!timeline) {
+      return res.status(404).json({
+        message: `Timeline not found for employee ${employeeId} on ${date}`,
+      });
+    }
+
+    // Find the task within the timeline
+    const taskIndex = timeline.tasks.findIndex(
+      (t) => t.title === taskTitle
+    );
+
+    if (taskIndex === -1) {
+      return res.status(404).json({
+        message: `Task "${taskTitle}" not found in timeline`,
+      });
+    }
+
+    // Update the task's end_time (allow null)
+    const newEnd = end_time === undefined ? null : end_time;
+    timeline.tasks[taskIndex].end_time = newEnd;
+    await timeline.save();
+
+    res.json({
+      message: "Task end_time updated successfully",
       timeline,
     });
   } catch (error) {

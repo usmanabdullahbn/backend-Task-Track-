@@ -6,6 +6,8 @@ const TaskSchema = new mongoose.Schema(
     lng: Number,
     title: String,
     time : String,
+    start_time: String,
+    end_time: String,
     startedAt: {
       type: Date,
       default: Date.now,
