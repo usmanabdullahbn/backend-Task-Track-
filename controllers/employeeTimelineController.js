@@ -196,7 +196,7 @@ export const updateTaskEndTime = async (req, res) => {
     }
 
     // Update the task's end_time (allow null)
-    const newEnd = end_time === undefined ? null : end_time;
+    const newEnd = end_time;
     timeline.tasks[taskIndex].end_time = newEnd;
     await timeline.save();
 
