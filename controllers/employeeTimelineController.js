@@ -163,7 +163,7 @@ export const getTimelineByEmployeeIdAndDate = async (req, res) => {
 // Update task with end_time
 export const updateTaskEndTime = async (req, res) => {
   try {
-    const { employeeId, date, taskTitle, end_time } = req.body;
+    const { employeeId, date, taskTitle, end_time, start_time, startedAt } = req.body;
 
     // Validate required fields (end_time may be null)
     if (!employeeId || !date || !taskTitle) {
@@ -184,10 +184,39 @@ export const updateTaskEndTime = async (req, res) => {
       });
     }
 
-    // Find the task within the timeline
-    const taskIndex = timeline.tasks.findIndex(
-      (t) => t.title === taskTitle
-    );
+    // Find the task within the timeline.
+    // Prefer exact match by `startedAt` (ISO string), then by `start_time` string,
+    // otherwise pick the most recent open task with matching title (end_time == null).
+    let taskIndex = -1;
+
+    if (startedAt) {
+      const targetIso = new Date(startedAt).toISOString();
+      taskIndex = timeline.tasks.findIndex((t) => {
+        if (!t.startedAt) return false;
+        try {
+          return new Date(t.startedAt).toISOString() === targetIso && t.title === taskTitle;
+        } catch (err) {
+          return false;
+        }
+      });
+    }
+
+    if (taskIndex === -1 && start_time) {
+      taskIndex = timeline.tasks.findIndex(
+        (t) => t.title === taskTitle && t.start_time === start_time
+      );
+    }
+
+    if (taskIndex === -1) {
+      // fallback: find last task with same title and no end_time (assumed active)
+      for (let i = timeline.tasks.length - 1; i >= 0; i--) {
+        const t = timeline.tasks[i];
+        if (t.title === taskTitle && (t.end_time === null || t.end_time === undefined)) {
+          taskIndex = i;
+          break;
+        }
+      }
+    }
 
     if (taskIndex === -1) {
       return res.status(404).json({
