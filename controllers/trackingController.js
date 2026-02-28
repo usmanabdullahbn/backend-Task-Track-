@@ -91,6 +91,16 @@ export const saveLocation = async (req, res) => {
     }
 
     // Step 3: Now save new location
+    // Determine type: first location is start; if the session has been closed, mark as end
+    let locationType = 'regular';
+    if (!lastLocation) {
+      locationType = 'start';
+    }
+    if (session.status === 'closed') {
+      // the last point we receive after closing should be tagged as end
+      locationType = 'end';
+    }
+
     const locationPoint = await LocationPoint.create({
       workerId: workerObjectId,
       sessionId: session._id,
@@ -100,7 +110,7 @@ export const saveLocation = async (req, res) => {
       speed: speed || 0,
       locationName: req.body.locationName || `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`,
       timeFormatted: req.body.timeFormatted || new Date().toLocaleTimeString(),
-      locationType: !lastLocation ? 'start' : 'regular' // First location is start
+      locationType,
     });
 
     // Professional idle logic: track start/end

@@ -13,7 +13,7 @@ const locationPointSchema = new mongoose.Schema({
   speed: Number,
   locationName: String,
   timeFormatted: String,
-  locationType: { type: String, enum: ['regular', 'start', 'idle'], default: 'regular' } // FIX #5: Mark location type
+  locationType: { type: String, enum: ['regular', 'start', 'idle', 'end'], default: 'regular' } // FIX #5: Mark location type
 });
 
 // Performance indexes
