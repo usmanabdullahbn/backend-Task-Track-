@@ -62,7 +62,11 @@ export const saveLocation = async (req, res) => {
       return res.status(400).json({ message: "Invalid coordinates" });
     }
 
-    const today = new Date().toISOString().split('T')[0];
+    // use client-supplied date when available, otherwise fall back to Qatar local day
+    const today = req.body.date ||
+      new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Qatar' }))
+        .toISOString()
+        .split('T')[0];
 
     const session = await getOrCreateSession(workerObjectId, today);
 
@@ -101,15 +105,18 @@ export const saveLocation = async (req, res) => {
       locationType = 'end';
     }
 
+    const now = new Date();
     const locationPoint = await LocationPoint.create({
       workerId: workerObjectId,
       sessionId: session._id,
       latitude,
       longitude,
-      timestamp: new Date(),
+      timestamp: now,
       speed: speed || 0,
       locationName: req.body.locationName || `${latitude.toFixed(4)}, ${longitude.toFixed(4)}`,
-      timeFormatted: req.body.timeFormatted || new Date().toLocaleTimeString(),
+      // prefer any value the app sent (already formatted in 24‑hour); fallback to server compute
+      timeFormatted: req.body.timeFormatted || now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }),
+      date: req.body.date || new Date(now.toLocaleString('en-US', { timeZone: 'Asia/Qatar' })).toISOString().split('T')[0],
       locationType,
     });
 
@@ -183,7 +190,11 @@ export const startTask = async (req, res) => {
       return res.status(400).json({ message: "Invalid Worker ID or Task ID format" });
     }
 
-    const today = new Date().toISOString().split('T')[0];
+    // maintain same client-date logic used in location upload
+    const today = req.body.date ||
+      new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Qatar' }))
+        .toISOString()
+        .split('T')[0];
 
     const session = await getOrCreateSession(workerObjectId, today);
 
@@ -264,7 +275,16 @@ export const getTimeline = async (req, res) => {
       return res.status(404).json({ message: 'No session found' });
     }
 
-    const locations = await LocationPoint.find({ sessionId: session._id }).sort({ timestamp: 1 });
+    let locations = await LocationPoint.find({ sessionId: session._id }).sort({ timestamp: 1 });
+    // make sure any missing or legacy entries still have a 24-hour string, but do not override app-supplied values
+    locations = locations.map(loc => {
+      let tf = loc.timeFormatted;
+      if (!tf || tf.includes('AM') || tf.includes('PM')) {
+        tf = new Date(loc.timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false });
+      }
+      return { ...loc.toObject(), timeFormatted: tf };
+    });
+
     // FIX #3: Populate task details instead of just IDs
     const tasks = await TaskVisit.find({ sessionId: session._id })
       .populate('taskId', 'title name description')
