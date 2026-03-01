@@ -120,6 +120,33 @@ export const saveLocation = async (req, res) => {
       locationType,
     });
 
+    // --- AUTO LEAVE-CHECK: if worker strays from active task
+    const activeTask = await TaskVisit.findOne({
+      workerId: workerObjectId,
+      sessionId: session._id,
+      endTime: null,
+      leftTime: null,
+    }).sort({ startTime: -1 });
+
+    if (activeTask) {
+      const distanceFromTask = getDistance(
+        activeTask.latitude,
+        activeTask.longitude,
+        latitude,
+        longitude
+      );
+
+      // 200 meters threshold -> 0.2 km
+      if (distanceFromTask > 0.2) {
+        activeTask.leftTime = now;
+        if (latitude != null) activeTask.leftLatitude = latitude;
+        if (longitude != null) activeTask.leftLongitude = longitude;
+        activeTask.duration = (activeTask.leftTime - activeTask.startTime) / 1000; // seconds
+        await activeTask.save();
+        console.log("Worker LEFT task location automatically (distance >200m)");
+      }
+    }
+
     // Professional idle logic: track start/end
     let idleLog = await IdleLog.findOne({
       workerId: workerObjectId,
