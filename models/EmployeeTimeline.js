@@ -8,6 +8,9 @@ const TaskSchema = new mongoose.Schema(
     time : String,
     start_time: String,
     end_time: String,
+    left_time: String,        // when worker left the task location
+    left_lat: Number,
+    left_lng: Number,
     startedAt: {
       type: Date,
       default: Date.now,

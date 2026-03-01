@@ -163,12 +163,19 @@ export const getTimelineByEmployeeIdAndDate = async (req, res) => {
 // Update task with end_time
 export const updateTaskEndTime = async (req, res) => {
   try {
-    const { employeeId, date, taskTitle, end_time, start_time, startedAt } = req.body;
+    const { employeeId, date, taskTitle, end_time, left_time, left_lat, left_lng, start_time, startedAt } = req.body;
 
-    // Validate required fields (end_time may be null)
+    // Validate required fields (end_time/left_time may be null but at least one of them should be present)
     if (!employeeId || !date || !taskTitle) {
       return res.status(400).json({
         message: "Missing required fields: employeeId, date, taskTitle",
+      });
+    }
+
+    // ensure there is at least something to update
+    if (!end_time && !left_time) {
+      return res.status(400).json({
+        message: "Either end_time or left_time must be provided",
       });
     }
 
@@ -224,13 +231,21 @@ export const updateTaskEndTime = async (req, res) => {
       });
     }
 
-    // Update the task's end_time (allow null)
-    const newEnd = end_time;
-    timeline.tasks[taskIndex].end_time = newEnd;
+    // Update the task's timestamp(s).
+    if (left_time) {
+      timeline.tasks[taskIndex].left_time = left_time;
+      if (left_lat != null) timeline.tasks[taskIndex].left_lat = left_lat;
+      if (left_lng != null) timeline.tasks[taskIndex].left_lng = left_lng;
+      // optionally clear end_time if we are marking a leave event
+      timeline.tasks[taskIndex].end_time = null;
+    } else {
+      timeline.tasks[taskIndex].end_time = end_time;
+    }
+
     await timeline.save();
 
     res.json({
-      message: "Task end_time updated successfully",
+      message: left_time ? "Task left_time updated successfully" : "Task end_time updated successfully",
       timeline,
     });
   } catch (error) {

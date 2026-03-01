@@ -213,6 +213,51 @@ export const startTask = async (req, res) => {
   }
 };
 
+// Worker left task (left location/time)
+export const leaveTask = async (req, res) => {
+  try {
+    const { taskId, workerId, latitude, longitude } = req.body;
+
+    if (!workerId) {
+      return res.status(400).json({ message: "Worker ID required" });
+    }
+    if (!taskId) {
+      return res.status(400).json({ message: "Task ID required" });
+    }
+
+    // Convert IDs to ObjectId
+    let workerObjectId, taskObjectId;
+    try {
+      workerObjectId = new mongoose.Types.ObjectId(workerId);
+      taskObjectId = new mongoose.Types.ObjectId(taskId);
+    } catch (error) {
+      return res.status(400).json({ message: "Invalid Worker ID or Task ID format" });
+    }
+
+    // find the active visit that hasn't been ended or marked as left yet
+    const taskVisit = await TaskVisit.findOne({
+      workerId: workerObjectId,
+      taskId: taskObjectId,
+      endTime: null,
+      leftTime: null
+    }).sort({ startTime: -1 });
+
+    if (taskVisit) {
+      const now = new Date();
+      taskVisit.leftTime = now;
+      if (latitude != null) taskVisit.leftLatitude = latitude;
+      if (longitude != null) taskVisit.leftLongitude = longitude;
+      // duration until leave
+      taskVisit.duration = (now - taskVisit.startTime) / 1000; // seconds
+      await taskVisit.save();
+    }
+
+    res.status(200).json({ taskVisit });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
 // End task
 export const endTask = async (req, res) => {
   try {

@@ -16,6 +16,9 @@ const taskVisitSchema = new mongoose.Schema({
   longitude: Number,
   startTime: Date,
   endTime: Date,
+  leftTime: Date,               // when worker left task location unexpectedly
+  leftLatitude: Number,
+  leftLongitude: Number,
   duration: Number
 });
 
