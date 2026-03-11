@@ -15,6 +15,7 @@ import taskRoutes from "./routes/taskRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import employeeTimelineRoutes from "./routes/employeeTimelineRoutes.js";
 import trackingRoutes from "./routes/trackingRoutes.js";
+import exportRoutes from "./routes/exportRoutes.js";
 
 dotenv.config();
 connectDB();
@@ -45,6 +46,7 @@ app.use("/api/tasks", taskRoutes);
 app.use("/api/dashboard", dashboardRoutes);
 app.use("/api/employee", employeeTimelineRoutes);
 app.use("/api/tracking", trackingRoutes);
+app.use("/api/export", exportRoutes);
 
 // Health check
 app.get("/api/health", (req, res) => {
