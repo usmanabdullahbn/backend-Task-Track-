@@ -144,6 +144,7 @@ export const updateUser = async (req, res, next) => {
     const {
       name,
       email,
+      password,
       designation,
       role,
       phone,
@@ -176,6 +177,7 @@ export const updateUser = async (req, res, next) => {
     // 🔄 Update fields only if provided
     if (name) userDoc.name = name;
     if (email) userDoc.email = email;
+    if (password) userDoc.password = password;
     if (designation) userDoc.designation = designation;
     if (role) userDoc.role = role;
     if (phone) userDoc.phone = phone;
