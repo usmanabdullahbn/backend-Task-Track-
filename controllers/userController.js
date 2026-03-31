@@ -1,4 +1,6 @@
 import User from "../models/User.js";
+import dns from "dns/promises";
+import mongoose from "mongoose";
 
 export const getUsers = async (req, res, next) => {
   // I WANT PASS ALSO IN THE RESPONSE
@@ -133,6 +135,74 @@ export const createUser = async (req, res, next) => {
       message: "User created successfully",
       password: plainPassword, // only once
       user: userDoc,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
+export const validateUserEmailMailbox = async (req, res, next) => {
+  try {
+    const rawEmail = req.body?.email;
+    const email = typeof rawEmail === "string" ? rawEmail.trim().toLowerCase() : "";
+    const ignoreUserId = req.body?.ignoreUserId;
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        mailboxExists: false,
+        status: "invalid",
+        message: "Email is required",
+      });
+    }
+
+    const emailRe = /^[\w.-]+@[\w.-]+\.\w+$/;
+    if (!emailRe.test(email)) {
+      return res.status(200).json({
+        success: true,
+        mailboxExists: false,
+        status: "invalid",
+        message: "Please provide a valid email",
+      });
+    }
+
+    const duplicateQuery = { email };
+    if (ignoreUserId && mongoose.Types.ObjectId.isValid(ignoreUserId)) {
+      duplicateQuery._id = { $ne: ignoreUserId };
+    }
+    const existingUser = await User.findOne(duplicateQuery).select("_id");
+    if (existingUser) {
+      return res.status(200).json({
+        success: true,
+        mailboxExists: false,
+        status: "invalid",
+        message: "Email already exists. Only one user allowed per email.",
+      });
+    }
+
+    const domain = email.split("@")[1];
+
+    let mxRecords = [];
+    try {
+      mxRecords = await dns.resolveMx(domain);
+    } catch (mxError) {
+      mxRecords = [];
+    }
+
+    if (!Array.isArray(mxRecords) || mxRecords.length === 0) {
+      return res.status(200).json({
+        success: true,
+        mailboxExists: false,
+        status: "invalid",
+        message: "Mailbox is undeliverable (domain has no MX records).",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      mailboxExists: true,
+      status: "deliverable",
+      message: "Mailbox verified.",
     });
   } catch (error) {
     next(error);
