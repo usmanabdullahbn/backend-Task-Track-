@@ -5,11 +5,11 @@ const assetSchema = new mongoose.Schema({
 customer: {
     id: {
       type: String,
-      required: [true, "Please provide a customer Id"],
+      // required: [true, "Please provide a customer Id"],
     },
     name: {
       type: String,
-      required: [true, "Please provide a customer name"],
+      // required: [true, "Please provide a customer name"],
     },
   },
 
